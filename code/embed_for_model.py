@@ -86,4 +86,4 @@ subreddit_type_tensor = torch.from_numpy(pd.get_dummies(model_df['og_category'])
 torch.save(subreddit_type_tensor, './target_subreddit_types.pt')
 
 parent_subreddit_types = torch.from_numpy(model_df[['parent_racist', 'parent_anti-LGBTQ', 'parent_misogynistic']].values) #get the categories the parents posted in
-torch.save(parent_subreddit_types, './model_embeddings/parent_subreddit_types.pt')
+torch.save(parent_subreddit_types, './parent_subreddit_types.pt')
