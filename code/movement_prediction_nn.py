@@ -322,10 +322,10 @@ class HateMigrationNN(nn.Module):
 if __name__ == '__main__':
 
     if TRAINING_DATA == 'both':
-        context = torch.load('./parent_embeddings.pt')
-        target = torch.load('./target_embeddings.pt')
-        target_subreddit = torch.load('./target_subreddit_types.pt')
-        parent_subreddit = torch.load('./parent_subreddit_types.pt')
+        context = torch.load('../data/parent_embeddings.pt')
+        target = torch.load('../data/target_embeddings.pt')
+        target_subreddit = torch.load('../data/target_subreddit_types.pt')
+        parent_subreddit = torch.load('../data/parent_subreddit_types.pt')
         
         training_subreddit = torch.cat((target_subreddit, parent_subreddit), dim=1)
         embed_training = torch.cat((target, context), dim=1)
@@ -333,25 +333,25 @@ if __name__ == '__main__':
         additional_features = 6
 
     elif TRAINING_DATA == 'target':
-        embed_training = torch.load('./target_embeddings.pt')
-        training_subreddit = torch.load('./target_subreddit_types.pt')
+        embed_training = torch.load('../data/target_embeddings.pt')
+        training_subreddit = torch.load('../data/target_subreddit_types.pt')
         num_features = 768
         additional_features = 3
 
     elif TRAINING_DATA == 'parent':
-        embed_training = torch.load('./parent_embeddings.pt')
-        training_subreddit = torch.load('./parent_subreddit_types.pt')
+        embed_training = torch.load('../data/parent_embeddings.pt')
+        training_subreddit = torch.load('../data/parent_subreddit_types.pt')
         num_features = 768
         additional_features = 3
 
 
 
     
-    response = torch.load('./response.pt')
+    response = torch.load('../data/response.pt')
 
     
 
-    results_file = f'peripatetic_hater_prediction_performance_{TRAINING_DATA}.csv'
+    results_file = f'../data/peripatetic_hater_prediction_performance_{TRAINING_DATA}.csv'
     with open(results_file, 'w') as f:
         f.write('seed,racist,anti-LGBTQ,misogynistic,racist_subset,anti-LGBTQ_subset,misogynistic_subset\n')
 
