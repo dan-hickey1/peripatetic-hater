@@ -42,7 +42,7 @@ def embed_sequence(text):
 def create_row_vector(row):
     return [row[c] for c in row.index]
 
-model_df = pd.read_csv('./peripatetic_haters_15k_sample.csv', lineterminator='\n')
+model_df = pd.read_csv('../data/peripatetic_haters_15k_sample.csv', lineterminator='\n')
 
 unk_embedding = embed_sequence('UNK') #placeholder embedding for when the parent text is missing
 
@@ -76,14 +76,14 @@ for text in tqdm(model_df['parent_text'].to_list()):  #embed the parent
 
 y = torch.tensor(np.array(list(model_df[['racist', 'anti-LGBTQ', 'misogynistic']].apply(create_row_vector, axis=1))))
 
-torch.save(context_x, './parent_embeddings.pt')
-torch.save(target_x, './target_embeddings.pt')
+torch.save(context_x, '../data/parent_embeddings.pt')
+torch.save(target_x, '../data/target_embeddings.pt')
 
 torch.save(y, './response.pt')
 
 subreddit_type_tensor = torch.from_numpy(pd.get_dummies(model_df['og_category'])[['racist', 'anti-LGBTQ', 'misogynistic']].values) # get the category the user started in
 
-torch.save(subreddit_type_tensor, './target_subreddit_types.pt')
+torch.save(subreddit_type_tensor, '../data/target_subreddit_types.pt')
 
 parent_subreddit_types = torch.from_numpy(model_df[['parent_racist', 'parent_anti-LGBTQ', 'parent_misogynistic']].values) #get the categories the parents posted in
-torch.save(parent_subreddit_types, './parent_subreddit_types.pt')
+torch.save(parent_subreddit_types, '../data/parent_subreddit_types.pt')
