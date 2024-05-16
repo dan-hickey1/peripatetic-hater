@@ -2,7 +2,7 @@ Repository containing data for the paper "The Peripatetic Hater: Predicting Move
 
 ### Descriptions of files:
 
-`Sources_of_hate_subreddits.docx`: links to lists of potential hate subreddits we obtained to curate the dataset of hate subreddits.
+`Sources_of_hate_subreddits.pdf`: links to lists of potential hate subreddits we obtained to curate the dataset of hate subreddits.
 
 `data/subreddits_filtered_out.txt`: Subreddits we deemed from manual annotation to not be hateful.
 
