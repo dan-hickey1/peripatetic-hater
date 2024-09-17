@@ -26,12 +26,11 @@ logging.basicConfig(
 
 class HateMigrationNN(nn.Module):
 
-    def __init__(self, num_features=1536, additional_features=6, learning_rate=1e-4, optimizer=torch.optim.AdamW, loss_fn=nn.BCELoss(), device='cpu'):
+    def __init__(self, num_features=1536, categories=9, additional_features=9, learning_rate=1e-4, optimizer=torch.optim.AdamW, loss_fn=nn.BCELoss(), device='cpu'):
         super(HateMigrationNN, self).__init__()
-
         self.fc1 = nn.Linear(num_features, num_features // 2)
         self.fc2 = nn.Linear((num_features // 2) + additional_features, num_features // 4)
-        self.fc3 = nn.Linear((num_features//4), 3)
+        self.fc3 = nn.Linear((num_features//4), categories)
 
         self.device = device
         self.to(device)
@@ -58,13 +57,13 @@ class HateMigrationNN(nn.Module):
 
         return output
 
-    def fit(self, train_loader, valid_loader, results_file, epochs=1000, seed=0):
+    def fit(self, train_loader, valid_loader, results_file, num_categories, epochs=1000, seed=0):
         for epoch in range(epochs):
             self.train() 
 
             LOSS_train = 0.0
-            PRECISION_train, RECALL_train, F1_train, ACCURACY_train = np.zeros(3), np.zeros(3), np.zeros(3), np.zeros(3)
-            roc_scores = np.zeros(3)
+            PRECISION_train, RECALL_train, F1_train, ACCURACY_train = np.zeros(num_categories), np.zeros(num_categories), np.zeros(num_categories), np.zeros(num_categories)
+            roc_scores = np.zeros(num_categories)
             full_preds = []
             full_labels = []
 
@@ -111,8 +110,8 @@ class HateMigrationNN(nn.Module):
             with torch.no_grad():
 
                 LOSS_valid = 0.0
-                PRECISION_valid, RECALL_valid, F1_valid, ACCURACY_valid = np.zeros(3), np.zeros(3), np.zeros(3), np.zeros(3)
-                roc_scores_val = np.zeros(3)
+                PRECISION_valid, RECALL_valid, F1_valid, ACCURACY_valid = np.zeros(num_categories), np.zeros(num_categories), np.zeros(num_categories), np.zeros(num_categories)
+                roc_scores_val = np.zeros(num_categories)
                 full_preds_val = []
                 full_labels_val = []
                 full_input_val = []
@@ -139,7 +138,7 @@ class HateMigrationNN(nn.Module):
                     LOSS_valid += loss.item()
 
                     # Metrics
-                    for l in range(3):
+                    for l in range(num_categories):
                         (precision, recall, f1, accuracy) = self.get_metrics(predictions[:, l], labels[:, l], for_class=1)
                         PRECISION_valid[l] += precision
                         RECALL_valid[l] += recall
@@ -167,7 +166,7 @@ class HateMigrationNN(nn.Module):
         logging.info('Finished Training')
 
         roc_scores_subset = []
-        for i in range(3):
+        for i in range(num_categories):
             labels_s = labels_arr_val[input_arr_val[:, i] == 0][:, i]
             preds_s = preds_arr_val[input_arr_val[:, i] == 0][:, i]
             roc_scores_subset.append(roc_auc_score(labels_s, preds_s))
@@ -320,6 +319,8 @@ class HateMigrationNN(nn.Module):
 
         
 if __name__ == '__main__':
+    response = torch.load('../data/response.pt')
+    num_categories = response.shape[1]
 
     if TRAINING_DATA == 'both':
         context = torch.load('../data/parent_embeddings.pt')
@@ -327,38 +328,44 @@ if __name__ == '__main__':
         target_subreddit = torch.load('../data/target_subreddit_types.pt')
         parent_subreddit = torch.load('../data/parent_subreddit_types.pt')
         
+
         training_subreddit = torch.cat((target_subreddit, parent_subreddit), dim=1)
         embed_training = torch.cat((target, context), dim=1)
         num_features = 1536
-        additional_features = 6
+        additional_features = num_categories * 2
 
     elif TRAINING_DATA == 'target':
         embed_training = torch.load('../data/target_embeddings.pt')
         training_subreddit = torch.load('../data/target_subreddit_types.pt')
+
         num_features = 768
-        additional_features = 3
+        additional_features = num_categories
 
     elif TRAINING_DATA == 'parent':
         embed_training = torch.load('../data/parent_embeddings.pt')
         training_subreddit = torch.load('../data/parent_subreddit_types.pt')
+
         num_features = 768
-        additional_features = 3
-
-
-
-    
-    response = torch.load('../data/response.pt')
-
+        additional_features = num_categories
     
 
-    results_file = f'../data/peripatetic_hater_prediction_performance_{TRAINING_DATA}.csv'
+    results_file = f'peripatetic_hater_prediction_performance_{TRAINING_DATA}.csv'
+    cols = ['anti-LGBTQ', 'islamophobic', 'general_hate', 'racist', 'misogynistic', 'xenophobic']
+    header_string = 'seed'
+    for col in cols:
+        header_string += ',' + col
+    
+    for col in cols:
+        header_string += ',' + col + '_subset'
+
     with open(results_file, 'w') as f:
-        f.write('seed,racist,anti-LGBTQ,misogynistic,racist_subset,anti-LGBTQ_subset,misogynistic_subset\n')
+        f.write(header_string + '\n')
 
     #test_dataset = TensorDataset(embed_testing, testing_subreddit, testing_y)
+    print(embed_training.shape)
 
     for seed in tqdm(range(50)):
-        model = HateMigrationNN(device=dev, num_features=num_features, additional_features=additional_features)
+        model = HateMigrationNN(device=dev, num_features=num_features, categories=num_categories, additional_features=additional_features)
         X_train, X_val, X2_train, X2_val, Y_train, Y_val = train_test_split(
                 embed_training,
                 training_subreddit,
@@ -391,4 +398,4 @@ if __name__ == '__main__':
                     )
 
 
-        model.fit(train_loader, val_loader, results_file, epochs=80, seed=seed)
+        model.fit(train_loader, val_loader, results_file, num_categories=num_categories, epochs=80, seed=seed)
