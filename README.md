@@ -13,5 +13,3 @@ Repository containing data for the paper "The Peripatetic Hater: Predicting Move
 `code/embed_for_model.py`: Generates text embeddings and tensors from the training dataset. The files generated from this script will be used to train the neural network to predict peripatetic haters.
 
 `code/movement_prediction_nn.py`: Trains a neural network model from text embeddings and metadata provided in the training dataset. Run with one of the following three command line arguments: 'parent', 'target', or 'both'. The command line argument 'both' uses all available data for training, while 'parent' and 'target' use features associated with the posts users reply to and the posts users make themselves, respectively. This code generates a CSV file with ROC-AUC values for each random seed.
-
-This is a test
