@@ -44,7 +44,7 @@ Each instance of the dataset represents a subreddit.
 
 ### How many instances are there in total (of each type, if appropriate)?
 
-There are 120 instances: 69 racist subreddits, 32 anti-LGBTQ, and 19 misogynistic.
+There are 168 instances: 15 racist subreddits, 16 anti-LGBTQ, 32 misogynistic, 58 general hate, 7 Islamophobic, 35 xenophobic, 4 antisemitic, and 1 ableist.
 
 ### Does the dataset contain all possible instances or is it a sample (not necessarily random) of instances from a larger set?
 
@@ -52,11 +52,11 @@ The dataset is a sample of subreddits from a larger collection of crowdsourced l
 
 ### What data does each instance consist of? 
 
-Each instance consists of the name of a subreddit, the category of the subreddit, and the number of posts from a sample of posts that were predicted to be hate speech by GPT-4.
+Each instance consists of the name of a subreddit, the category of the subreddit, and standardized scores across a range of targeted identities, indicating how much hate speech directed at each identity is present in the subreddit relative to 
 
 ### Is there a label or target associated with each instance?
 
-Each subreddit is labeled as either "racist," "anti-LGBTQ," or "misogynistic."
+Each subreddit is labeled as either "racist," "anti-LGBTQ," "misogynistic," "general hate", "xenophobic," "Islamophobic," "antisemitic," or "ableist."
 
 ### Is any information missing from individual instances?
 
@@ -72,7 +72,7 @@ N/A.
 
 ### Are there any errors, sources of noise, or redundancies in the dataset?
 
-The model used to label hate speech in the subreddits is imperfect, and thus a source of noise. The R-squared value of the number of posts detected by it ranges from 0.88 for racist posts to 0.13 for antisemitic posts.
+The model used to label hate speech in the subreddits is imperfect, and thus a source of noise. The R-squared value of the number of posts detected by it ranges from 0.83 for racist posts to 0.09 for transphobic posts.
 
 ### Is the dataset self-contained, or does it link to or otherwise rely on external resources (e.g., websites, tweets, other datasets)?
 
@@ -111,11 +111,11 @@ reconstruct the dataset without access to it._
 
 ### How was the data associated with each instance acquired?
 
-Comments and submissions from each subreddit were randomly sampled from the Pushshift dataset (Baumgartner et al.). The number of comments and submissions containing hate speech of different categories was predicted using GPT4. 
+Comments and submissions from each subreddit were randomly sampled from the Pushshift dataset (Baumgartner et al.). The number of comments and submissions containing hate speech of different categories was predicted using a deep-learning model. 
 
 ### What mechanisms or procedures were used to collect the data (e.g., hardware apparatus or sensor, manual human curation, software program, software API)?
 
-For each subreddit, a sample of comments and submissions was collected, and GPT-4 was used to detect the number of comments and submissions containing hate speech of each category. See paper for more details on the prompt used for hate speech detection. These predictions were validated on a subset of 10 submissions and comments from 25 subreddits. Ground truth labels were obtained from trained annotators who counted the number of submissions and comments containing each type of hate speech in each subreddit. Across all categories, the R^{2} value of the hate speech prediction method is 0.45.
+For each subreddit, a sample of comments and submissions was collected, and a deep-learning model was used to detect the number of comments and submissions containing hate speech of each category. See paper for more details on hate speech detection. These predictions were validated on a subset of 10 submissions and comments from a random sample of 25 subreddits. Ground truth labels were obtained from trained annotators who counted the number of submissions and comments containing each type of hate speech in each subreddit. Across all categories, the average R^{2} value of the hate speech prediction method is 0.49.
 
 ### If the dataset is a sample from a larger set, what was the sampling strategy (e.g., deterministic, probabilistic with specific sampling probabilities)?
 
@@ -168,15 +168,15 @@ not suitable for tasks involving word order._
 
 ### Was any preprocessing/cleaning/labeling of the data done (e.g., discretization or bucketing, tokenization, part-of-speech tagging, SIFT feature extraction, removal of instances, processing of missing values)?
 
-Hate speech labels were assigned to groups of Reddit posts using GPT-4.
+Hate speech labels were assigned to groups of Reddit posts using deep learning methods.
 
 ### Was the “raw” data saved in addition to the preprocessed/cleaned/labeled data (e.g., to support unanticipated future uses)?
 
-The raw Reddit text is in the same GitHub repository as the list of subreddits.
+Yes, raw Reddit text is available upon motivated request.
 
 ### Is the software used to preprocess/clean/label the instances available?
 
-The prompts supplied to GPT-4 are provided in the paper, however, as GPT-4 is proprietary, we do not have access to the underlying software used to obtain the labels.
+Yes, the code used to train the hate speech detection model is in the same GitHub repository.
 
 ### Any other comments?
 
